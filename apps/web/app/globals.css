@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 43 38% 94%; /* #F7F3EA warm paper */
+    --foreground: 40 7% 10%; /* #1B1A17 rich ink */
+
+    --card: 45 100% 99%; /* #FFFDF8 clean page surface */
+    --card-foreground: 40 7% 10%;
+
+    --popover: 45 100% 99%;
+    --popover-foreground: 40 7% 10%;
+
+    --primary: 160 51% 25%; /* #1F5F4A leaf green */
+    --primary-hover: 162 52% 19%; /* #17493A deep leaf */
+    --primary-foreground: 45 100% 99%;
+
+    --secondary: 42 20% 90%;
+    --secondary-foreground: 40 7% 15%;
+
+    --muted: 42 20% 91%;
+    --muted-foreground: 43 7% 39%; /* #6B675D */
+
+    --accent: 41 76% 51%; /* #E0A526 saffron */
+    --accent-foreground: 40 7% 10%;
+
+    --destructive: 5 56% 51%; /* #C8453A */
+    --destructive-foreground: 45 100% 99%;
+
+    --border: 42 26% 85%; /* #E4DDCC hairline rule */
+    --input: 42 26% 85%;
+    --ring: 160 51% 25%;
+
+    --radius: 10px;
+
+    /* Semantic tokens */
+    --priority-critical: 5 56% 51%; /* #C8453A */
+    --priority-high: 39 96% 43%; /* #D98E04 */
+    --priority-medium: 212 46% 45%; /* #3E6FA8 */
+    --priority-low: 145 15% 49%; /* #6B8F7A */
+
+    --status-open: 212 46% 45%; /* #3E6FA8 */
+    --status-inprogress: 39 96% 43%; /* #D98E04 */
+    --status-resolved: 154 63% 33%; /* #1F8A5B */
+    --status-closed: 45 7% 45%; /* #7A766B */
+
+    --editorial-paper: 43 38% 94%;
+    --editorial-ink: 40 7% 10%;
+    --editorial-leaf: 160 51% 25%;
+    --editorial-saffron: 41 76% 51%;
+  }
+
+  .dark {
+    --background: 144 14% 6%; /* #0F1411 deep warm night */
+    --foreground: 45 26% 89%; /* #ECE8DC aged parchment text */
+
+    --card: 137 14% 10%; /* #161D18 dark card surface */
+    --card-foreground: 45 26% 89%;
+
+    --popover: 137 14% 10%;
+    --popover-foreground: 45 26% 89%;
+
+    --primary: 156 43% 56%; /* #5FBF99 soft luminous green */
+    --primary-hover: 156 45% 65%;
+    --primary-foreground: 144 14% 6%;
+
+    --secondary: 142 11% 15%;
+    --secondary-foreground: 45 26% 89%;
+
+    --muted: 142 11% 14%;
+    --muted-foreground: 45 10% 60%;
+
+    --accent: 42 78% 60%; /* #E8B84A golden saffron */
+    --accent-foreground: 144 14% 6%;
+
+    --destructive: 5 65% 55%;
+    --destructive-foreground: 45 100% 99%;
+
+    --border: 142 11% 17%; /* #26302A subtle dark rule */
+    --input: 142 11% 17%;
+    --ring: 156 43% 56%;
+
+    /* Semantic tokens in dark mode (contrast tuned) */
+    --priority-critical: 5 68% 58%;
+    --priority-high: 39 88% 52%;
+    --priority-medium: 212 55% 58%;
+    --priority-low: 145 25% 60%;
+
+    --status-open: 212 55% 58%;
+    --status-inprogress: 39 88% 52%;
+    --status-resolved: 154 55% 45%;
+    --status-closed: 45 10% 60%;
+
+    --editorial-paper: 144 14% 6%;
+    --editorial-ink: 45 26% 89%;
+    --editorial-leaf: 156 43% 56%;
+    --editorial-saffron: 42 78% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground font-sans;
+  }
+}
+
+/* Subtle paper grain texture overlay for author pages */
+.paper-grain {
+  background-image: radial-gradient(rgba(27, 26, 23, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.dark .paper-grain {
+  background-image: radial-gradient(rgba(236, 232, 220, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Utility for tabular numbers across all monetary and numeric outputs */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hairline rule borders */
+.border-hairline {
+  border-width: 1px;
+}

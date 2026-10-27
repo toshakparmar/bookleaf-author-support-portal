@@ -19,14 +19,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-const GENRE_SPINE_COLORS: Record<string, string> = {
-  Fiction: '#1F5F4A',
-  Poetry: '#96607E',
-  'Non-Fiction': '#3E6FA8',
-  Memoir: '#D98E04',
-  Thriller: '#C8453A',
-  Romance: '#B85D75',
-};
+import { BookCover } from '../../../components/brand/BookCover';
+import { LottieAnimation } from '../../../components/shared/LottieAnimation';
 
 export default function MyBooksPage() {
   const [books, setBooks] = useState<any[]>([]);
@@ -162,41 +156,45 @@ export default function MyBooksPage() {
         </div>
 
         {books.length === 0 ? (
-          <EmptyState
-            title="No Titles in Catalog"
-            description="You do not have any published books or active manuscripts in production yet."
-            action={
-              <Link
-                href="/author/tickets/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary-hover transition"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Contact Editorial Desk</span>
-              </Link>
-            }
-          />
+          <div className="bg-card border border-border rounded-xl p-10 text-center flex flex-col items-center">
+            <LottieAnimation type="empty-inbox" size="lg" className="mb-4" />
+            <h3 className="font-display text-xl font-medium text-foreground">No Titles in Catalog</h3>
+            <p className="text-xs text-muted-foreground max-w-sm mt-1.5 mb-6">
+              You do not have any published books or active manuscripts in production yet.
+            </p>
+            <Link
+              href="/author/tickets/new"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary-hover transition"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Contact Editorial Desk</span>
+            </Link>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5">
+          <div className="grid grid-cols-1 gap-6">
             {books.map((book) => {
               const inProduction = book.status.toLowerCase().includes('production');
               const isPendingBelowThreshold =
                 book.royaltyPending > 0 && book.royaltyPending < 1000;
-              const spineColor =
-                GENRE_SPINE_COLORS[book.genre] || '#1F5F4A';
 
               return (
                 <SpotlightCard
                   key={book.id}
-                  className="p-0 border-border bg-card overflow-hidden"
+                  className="p-0 border-border bg-card overflow-hidden hover:border-primary/40 transition duration-300"
                 >
-                  <div className="flex flex-col sm:flex-row">
-                    {/* Spine colored edge */}
-                    <div
-                      className="w-full sm:w-2 shrink-0 h-1 sm:h-auto"
-                      style={{ backgroundColor: spineColor }}
-                    />
+                  <div className="flex flex-col md:flex-row items-stretch">
+                    {/* 3D Procedural Book Cover column */}
+                    <div className="p-6 pb-2 md:pb-6 md:pr-0 flex items-center justify-center md:justify-start">
+                      <BookCover
+                        title={book.title}
+                        authorName="BookLeaf Author"
+                        genre={book.genre}
+                        size="md"
+                        className="shadow-md"
+                      />
+                    </div>
 
-                    <div className="p-6 flex-1">
+                    <div className="p-6 flex-1 min-w-0">
                       {/* Top Row: Title, Codes, Status, Query shortcut */}
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                         <div>

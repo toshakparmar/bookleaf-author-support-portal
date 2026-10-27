@@ -8,6 +8,10 @@ import { gsap } from '../../../lib/gsap';
 import { SplitText } from '../../../components/reactbits/SplitText';
 import { CountUp } from '../../../components/reactbits/CountUp';
 import { Logo } from '../../../components/brand/Logo';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { BookCover } from '../../../components/brand/BookCover';
+import { LottieAnimation } from '../../../components/shared/LottieAnimation';
 import {
   Lock,
   Mail,
@@ -129,6 +133,19 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
       {/* Left editorial brand panel */}
       <div className="relative lg:w-1/2 bg-[#17493A] text-[#FFFDF8] flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden">
+        {/* Real photo overlay with duotone effect and Ken Burns animation */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <Image
+            src="/images/hero-book-desk.jpg"
+            alt="Warm editorial studio desk"
+            fill
+            priority
+            className="object-cover opacity-20 mix-blend-luminosity scale-105"
+            sizes="50vw"
+          />
+          <div className="absolute inset-0 bg-[#17493A]/80 mix-blend-multiply" />
+        </div>
+
         {/* Atmospheric silk canvas overlay */}
         <AtmosphericBackground />
 
@@ -155,8 +172,36 @@ export default function LoginPage() {
             and transparent quarterly royalties with an unwavering 48-hour response promise.
           </p>
 
+          {/* Floating procedural book-cover pair */}
+          <div className="hidden xl:flex items-center gap-6 mt-8 pt-6 border-t border-white/15">
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <BookCover
+                title="The Silence of Pines"
+                authorName="Priya Sharma"
+                genre="Literary Fiction"
+                size="sm"
+                className="shadow-2xl"
+              />
+            </motion.div>
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+            >
+              <BookCover
+                title="Whispers in the Mist"
+                authorName="Sneha Kulkarni"
+                genre="Poetry"
+                size="sm"
+                className="shadow-2xl"
+              />
+            </motion.div>
+          </div>
+
           {/* 3 Quiet trust stats with CountUp */}
-          <div className="mt-10 pt-8 border-t border-white/15 grid grid-cols-3 gap-6">
+          <div className="mt-8 pt-6 border-t border-white/15 grid grid-cols-3 gap-6">
             <div>
               <div className="font-display text-2xl sm:text-3xl font-medium text-[#FFFDF8]">
                 <CountUp to={22000} suffix="+" duration={1.5} />

@@ -10,6 +10,8 @@ import { PriorityBadge } from '../../../../components/shared/PriorityBadge';
 import { CategoryTag } from '../../../../components/shared/CategoryTag';
 import { SlaBadge } from '../../../../components/shared/SlaBadge';
 import { ShinyText } from '../../../../components/reactbits/ShinyText';
+import { BookCover } from '../../../../components/brand/BookCover';
+import { LottieAnimation } from '../../../../components/shared/LottieAnimation';
 import { useTicketStream, TicketStreamEvent } from '../../../../lib/useTicketStream';
 import { toast } from 'sonner';
 import {
@@ -398,45 +400,56 @@ export default function AdminTicketDetailPage() {
             {/* Book Facts */}
             {ticket.book ? (
               <div className="pt-3 border-t border-border space-y-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-display text-sm font-medium text-foreground">
-                    {ticket.book.title}
-                  </span>
-                  <StatusBadge status={ticket.book.status} />
-                </div>
+                <div className="flex items-start gap-4">
+                  <BookCover
+                    title={ticket.book.title}
+                    authorName={ticket.author?.name || 'BookLeaf Author'}
+                    genre={ticket.book.genre || 'Fiction'}
+                    size="sm"
+                    className="shrink-0 shadow-sm"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-display text-sm font-medium text-foreground truncate">
+                        {ticket.book.title}
+                      </span>
+                      <StatusBadge status={ticket.book.status} />
+                    </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div>
-                    <span className="text-muted-foreground block font-mono text-[10px] uppercase">
-                      ISBN
-                    </span>
-                    <span className="font-mono font-medium text-foreground">
-                      {ticket.book.isbn || 'Pending'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block font-mono text-[10px] uppercase">
-                      Pub Date
-                    </span>
-                    <span className="font-medium text-foreground">
-                      {ticket.book.publicationDate ? formatDate(ticket.book.publicationDate) : 'In Production'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block font-mono text-[10px] uppercase">
-                      MRP
-                    </span>
-                    <span className="font-mono font-medium text-foreground">
-                      {ticket.book.mrp ? `₹${ticket.book.mrp}` : 'Not set'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block font-mono text-[10px] uppercase">
-                      Copies Sold
-                    </span>
-                    <span className="font-mono font-medium text-foreground">
-                      {ticket.book.totalCopiesSold}
-                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mt-2.5">
+                      <div>
+                        <span className="text-muted-foreground block font-mono text-[10px] uppercase">
+                          ISBN
+                        </span>
+                        <span className="font-mono font-medium text-foreground">
+                          {ticket.book.isbn || 'Pending'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block font-mono text-[10px] uppercase">
+                          Pub Date
+                        </span>
+                        <span className="font-medium text-foreground">
+                          {ticket.book.publicationDate ? formatDate(ticket.book.publicationDate) : 'In Production'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block font-mono text-[10px] uppercase">
+                          MRP
+                        </span>
+                        <span className="font-mono font-medium text-foreground">
+                          {ticket.book.mrp ? `₹${ticket.book.mrp}` : 'Not set'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block font-mono text-[10px] uppercase">
+                          Copies Sold
+                        </span>
+                        <span className="font-mono font-medium text-foreground">
+                          {ticket.book.totalCopiesSold}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -671,8 +684,8 @@ export default function AdminTicketDetailPage() {
               </div>
 
               {loadingDraft ? (
-                <div className="h-44 bg-background border border-border rounded-lg p-4 flex flex-col justify-center items-center gap-2 text-xs">
-                  <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                <div className="h-44 bg-background border border-border rounded-lg p-4 flex flex-col justify-center items-center gap-3 text-xs">
+                  <LottieAnimation type="ai-thinking" size="md" />
                   <ShinyText text="Synthesizing policy and book facts into draft..." />
                 </div>
               ) : (

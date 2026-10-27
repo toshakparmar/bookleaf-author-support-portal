@@ -7,6 +7,10 @@ import { useDropzone } from 'react-dropzone';
 import { fetchApi } from '../../../../lib/api';
 import { PageHeader } from '../../../../components/shared/PageHeader';
 import { ClickSpark } from '../../../../components/reactbits/ClickSpark';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LottieAnimation } from '../../../../components/shared/LottieAnimation';
+import { BookCover } from '../../../../components/brand/BookCover';
 import {
   ArrowLeft,
   Send,
@@ -19,6 +23,7 @@ import {
   Camera,
   Coins,
   Barcode,
+  BookOpen,
 } from 'lucide-react';
 
 function NewTicketForm() {
@@ -35,6 +40,14 @@ function NewTicketForm() {
   const [submitting, setSubmitting] = useState(false);
   const [createdTicket, setCreatedTicket] = useState<any>(null);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const selectedBook = books.find((b) => b.id === bookId);
+  const lowerSubj = (subject + ' ' + description).toLowerCase();
+  let categoryTopic = 'general';
+  if (lowerSubj.includes('royalt') || lowerSubj.includes('payment') || lowerSubj.includes('payout')) categoryTopic = 'royalty';
+  else if (lowerSubj.includes('print') || lowerSubj.includes('cover') || lowerSubj.includes('page') || lowerSubj.includes('paper')) categoryTopic = 'print';
+  else if (lowerSubj.includes('amazon') || lowerSubj.includes('flipkart') || lowerSubj.includes('distribut') || lowerSubj.includes('stock')) categoryTopic = 'distribution';
+  else if (lowerSubj.includes('isbn') || lowerSubj.includes('barcode')) categoryTopic = 'isbn';
 
   useEffect(() => {
     fetchApi('/authors/me/books')
@@ -115,9 +128,7 @@ function NewTicketForm() {
     return (
       <div className="max-w-xl mx-auto py-12 text-center">
         <div className="bg-card border border-border rounded-xl p-8 shadow-subtle">
-          <div className="w-12 h-12 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
+          <LottieAnimation type="success" size="lg" className="mx-auto mb-4" />
 
           <h2 className="font-display text-2xl font-medium text-foreground tracking-tight">
             Query Received &amp; Logged
@@ -335,50 +346,127 @@ function NewTicketForm() {
 
         {/* Right Column: Sticky "Before you submit" Knowledge Base Panel */}
         <div className="space-y-5">
-          <div className="sticky top-20 bg-card border border-border rounded-xl p-5 shadow-subtle space-y-4 text-xs">
-            <div className="flex items-center gap-2 pb-3 border-b border-border">
-              <HelpCircle className="w-4 h-4 text-primary shrink-0" />
-              <h3 className="font-display font-medium text-sm text-foreground">
-                Before You Submit
-              </h3>
-            </div>
-
-            <div className="space-y-3.5 text-muted-foreground">
-              <div className="flex items-start gap-2.5">
-                <Coins className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-foreground block">Royalty Discrepancies</strong>
-                  <span>
-                    Royalties are 80% of net profits calculated quarterly and paid within 45 days. Balances below ₹1,000 roll over.
+          <div className="sticky top-20 space-y-4">
+            {/* Dynamic Book Preview if Book Selected */}
+            {selectedBook && (
+              <div className="bg-card border border-border rounded-xl p-4 shadow-subtle flex items-center gap-3.5">
+                <BookCover
+                  title={selectedBook.title}
+                  authorName="BookLeaf Author"
+                  genre={selectedBook.genre}
+                  size="sm"
+                  className="shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
+                    Linked Title
                   </span>
+                  <h4 className="font-display font-medium text-sm text-foreground truncate mt-0.5">
+                    {selectedBook.title}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-1 text-[11px] font-mono text-muted-foreground">
+                    <span className="text-primary font-semibold">{selectedBook.status}</span>
+                    <span>&middot;</span>
+                    <span>{selectedBook.isbn || 'Pending ISBN'}</span>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="flex items-start gap-2.5">
-                <Barcode className="w-4 h-4 text-[#3E6FA8] shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-foreground block">ISBN Inconsistencies</strong>
-                  <span>
-                    Treated with High priority and escalated directly to production within 48 hours.
+            {/* Dynamic Category Photo Card with Framer Motion AnimatePresence */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={categoryTopic}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="relative h-32 rounded-xl overflow-hidden border border-border shadow-subtle group"
+              >
+                <Image
+                  src={
+                    categoryTopic === 'print'
+                      ? '/images/printing-binding.jpg'
+                      : categoryTopic === 'distribution'
+                      ? '/images/distribution-warehouse.jpg'
+                      : categoryTopic === 'royalty'
+                      ? '/images/author-writing.jpg'
+                      : '/images/hero-book-desk.jpg'
+                  }
+                  alt="Editorial guidance backdrop"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="350px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3.5 flex flex-col justify-end text-white">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#E8B84A]">
+                    {categoryTopic === 'print'
+                      ? 'Print Quality Guarantee'
+                      : categoryTopic === 'distribution'
+                      ? 'Retail Distribution Sync'
+                      : categoryTopic === 'royalty'
+                      ? 'Quarterly Net Royalties'
+                      : 'Author Operations Desk'}
                   </span>
+                  <p className="text-xs font-display font-medium text-white/90 leading-tight mt-0.5">
+                    {categoryTopic === 'print'
+                      ? '5–7 day replacement reprint turnaround for physical misprints'
+                      : categoryTopic === 'distribution'
+                      ? '24–48h automated catalogue re-sync across retail partners'
+                      : categoryTopic === 'royalty'
+                      ? '80% net author profit paid within 45 days of quarter end'
+                      : 'Direct escalation with human editorial supervision within 48 hours'}
+                  </p>
                 </div>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Sticky Guidelines Card */}
+            <div className="bg-card border border-border rounded-xl p-5 shadow-subtle space-y-4 text-xs">
+              <div className="flex items-center gap-2 pb-3 border-b border-border">
+                <HelpCircle className="w-4 h-4 text-primary shrink-0" />
+                <h3 className="font-display font-medium text-sm text-foreground">
+                  Before You Submit
+                </h3>
               </div>
 
-              <div className="flex items-start gap-2.5">
-                <Camera className="w-4 h-4 text-[#C8453A] shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-foreground block">Print Quality Issues</strong>
-                  <span>
-                    Please attach photos of the cover or misprinted pages to expedite free replacement authorization.
-                  </span>
+              <div className="space-y-3.5 text-muted-foreground">
+                <div className="flex items-start gap-2.5">
+                  <Coins className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground block">Royalty Discrepancies</strong>
+                    <span>
+                      Royalties are 80% of net profits calculated quarterly and paid within 45 days. Balances below ₹1,000 roll over.
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-start gap-2.5 pt-2 border-t border-border">
-                <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-foreground block">Support SLA Guarantee</strong>
-                  <span>All author inquiries receive an initial response within 48 hours.</span>
+                <div className="flex items-start gap-2.5">
+                  <Barcode className="w-4 h-4 text-[#3E6FA8] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground block">ISBN Inconsistencies</strong>
+                    <span>
+                      Treated with High priority and escalated directly to production within 48 hours.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5">
+                  <Camera className="w-4 h-4 text-[#C8453A] shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground block">Print Quality Issues</strong>
+                    <span>
+                      Please attach photos of the cover or misprinted pages to expedite free replacement authorization.
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 pt-2 border-t border-border">
+                  <Clock className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground block">Support SLA Guarantee</strong>
+                    <span>All author inquiries receive an initial response within 48 hours.</span>
+                  </div>
                 </div>
               </div>
             </div>

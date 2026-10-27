@@ -7,6 +7,8 @@ import { fetchApi } from '../../../../lib/api';
 import { formatDate, formatRelativeAge } from '../../../../lib/utils';
 import { StatusBadge } from '../../../../components/shared/StatusBadge';
 import { CategoryTag } from '../../../../components/shared/CategoryTag';
+import { BookCover } from '../../../../components/brand/BookCover';
+import { LottieAnimation } from '../../../../components/shared/LottieAnimation';
 import { useTicketStream, TicketStreamEvent } from '../../../../lib/useTicketStream';
 import {
   ArrowLeft,
@@ -111,15 +113,27 @@ export default function AuthorTicketDetailPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header with Ticket Details */}
-      <div className="flex items-start gap-3.5 pb-5 border-b border-border">
+      <div className="flex items-start gap-4 pb-5 border-b border-border">
         <Link
           href="/author/tickets"
-          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-card transition mt-1"
+          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-card transition mt-1 shrink-0"
         >
           <ArrowLeft className="w-4 h-4" />
         </Link>
 
-        <div className="space-y-1.5 flex-1">
+        {ticket.book && (
+          <div className="hidden sm:block shrink-0">
+            <BookCover
+              title={ticket.book.title}
+              authorName="BookLeaf Author"
+              genre={ticket.book.genre || 'General'}
+              size="sm"
+              className="shadow-sm"
+            />
+          </div>
+        )}
+
+        <div className="space-y-1.5 flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-mono text-xs font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border">
               {ticket.ticketNumber}

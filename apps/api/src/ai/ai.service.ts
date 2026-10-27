@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsService } from '../events/events.service';
 import { AnthropicProvider } from './providers/anthropic.provider';
 import { OpenAiProvider } from './providers/openai.provider';
+import { GeminiProvider } from './providers/gemini.provider';
 import { LlmProvider } from './providers/llm-provider.interface';
 import { KbRetriever } from './knowledge-base/kb.retriever';
 import { AuthorContextBuilder } from './context/author-context.builder';
@@ -30,11 +31,18 @@ export class AiService {
     private readonly eventsService: EventsService,
     private readonly anthropicProvider: AnthropicProvider,
     private readonly openAiProvider: OpenAiProvider,
+    private readonly geminiProvider: GeminiProvider,
     private readonly kbRetriever: KbRetriever,
     private readonly authorContextBuilder: AuthorContextBuilder,
   ) {
     const chosenProvider = (process.env.AI_PROVIDER || 'anthropic').toLowerCase();
-    this.provider = chosenProvider === 'openai' ? this.openAiProvider : this.anthropicProvider;
+    if (chosenProvider === 'openai') {
+      this.provider = this.openAiProvider;
+    } else if (chosenProvider === 'gemini' || chosenProvider === 'google') {
+      this.provider = this.geminiProvider;
+    } else {
+      this.provider = this.anthropicProvider;
+    }
     this.logger.log(`Initialized AI Service with provider: ${this.provider.getProviderName()}`);
   }
 
@@ -89,7 +97,7 @@ export class AiService {
             systemPrompt,
             userPrompt,
             temperature: 0,
-            maxTokens: 200,
+            maxTokens: 800,
             jsonMode: true,
           });
         });
@@ -265,7 +273,7 @@ export class AiService {
             systemPrompt,
             userPrompt,
             temperature: 0.3,
-            maxTokens: 600,
+            maxTokens: 1200,
             jsonMode: true,
           });
         });
@@ -345,15 +353,19 @@ export class AiService {
       const clean = this.cleanJsonString(raw);
       const parsed = JSON.parse(clean);
       return ClassificationResultSchema.parse(parsed);
-    } catch {
-      // 1 repair retry on bad JSON
+    } catch (err: any) {
       const repaired = this.cleanJsonString(raw);
       const match = repaired.match(/\{[\s\S]*\}/);
       if (match) {
-        const parsed = JSON.parse(match[0]);
-        return ClassificationResultSchema.parse(parsed);
+        try {
+          const parsed = JSON.parse(match[0]);
+          return ClassificationResultSchema.parse(parsed);
+        } catch (innerErr: any) {
+          this.logger.error(`Classification parse error on repaired JSON: ${innerErr.message}, raw: ${raw}`);
+        }
       }
-      throw new Error('Failed to parse valid JSON from AI classification output');
+      this.logger.error(`Classification parse error: ${err.message}, raw: ${raw}`);
+      throw new Error(`Failed to parse valid JSON from AI classification output: ${err.message}`);
     }
   }
 
@@ -362,14 +374,19 @@ export class AiService {
       const clean = this.cleanJsonString(raw);
       const parsed = JSON.parse(clean);
       return DraftResultSchema.parse(parsed);
-    } catch {
+    } catch (err: any) {
       const clean = this.cleanJsonString(raw);
       const match = clean.match(/\{[\s\S]*\}/);
       if (match) {
-        const parsed = JSON.parse(match[0]);
-        return DraftResultSchema.parse(parsed);
+        try {
+          const parsed = JSON.parse(match[0]);
+          return DraftResultSchema.parse(parsed);
+        } catch (innerErr: any) {
+          this.logger.error(`Draft parse error on repaired JSON: ${innerErr.message}, raw: ${raw}`);
+        }
       }
-      throw new Error('Failed to parse valid JSON from AI draft output');
+      this.logger.error(`Draft parse error: ${err.message}, raw: ${raw}`);
+      throw new Error(`Failed to parse valid JSON from AI draft output: ${err.message}`);
     }
   }
 

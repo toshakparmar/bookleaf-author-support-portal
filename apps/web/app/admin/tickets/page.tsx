@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { fetchApi } from '../../../lib/api';
 import { formatDate, formatRelativeAge } from '../../../lib/utils';
 import { PageHeader } from '../../../components/shared/PageHeader';
@@ -26,7 +27,13 @@ import {
   BookOpen,
 } from 'lucide-react';
 
-export default function AdminQueuePage() {
+function AdminQueueContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const urlAssignee = searchParams?.get('assignee')?.toLowerCase() || 'all';
+  const urlSlaBreached = searchParams?.get('slaBreached') === 'true';
+
   const [tickets, setTickets] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [meta, setMeta] = useState<any>({ total: 0, totalPages: 1 });
@@ -36,11 +43,36 @@ export default function AdminQueuePage() {
   const [status, setStatus] = useState('');
   const [category, setCategory] = useState('');
   const [priority, setPriority] = useState('');
-  const [assignee, setAssignee] = useState('all');
+  const [assignee, setAssignee] = useState(urlAssignee);
   const [search, setSearch] = useState('');
-  const [slaBreachedOnly, setSlaBreachedOnly] = useState(false);
+  const [slaBreachedOnly, setSlaBreachedOnly] = useState(urlSlaBreached);
   const [sort, setSort] = useState('urgency');
   const [page, setPage] = useState(1);
+
+  // Synchronize state when URL search parameters change (sidebar navigation)
+  useEffect(() => {
+    setAssignee(urlAssignee);
+    setSlaBreachedOnly(urlSlaBreached);
+    setPage(1);
+  }, [urlAssignee, urlSlaBreached]);
+
+  const updateFilterParam = (key: string, val: string | boolean) => {
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (key === 'assignee') {
+      if (val && val !== 'all') {
+        params.set('assignee', String(val));
+      } else {
+        params.delete('assignee');
+      }
+    } else if (key === 'slaBreached') {
+      if (val) {
+        params.set('slaBreached', 'true');
+      } else {
+        params.delete('slaBreached');
+      }
+    }
+    router.push(`/admin/tickets?${params.toString()}`);
+  };
 
   // Live incoming tickets indicator
   const [newTicketsCount, setNewTicketsCount] = useState(0);
@@ -112,7 +144,26 @@ export default function AdminQueuePage() {
     setSearch('');
     setSlaBreachedOnly(false);
     setPage(1);
+    router.push('/admin/tickets');
   };
+
+  let queueTitle = 'Publishing Operations Queue';
+  let queueDescription = 'AI-assisted triage, priority enforcement, SLA tracking, and automated response drafting.';
+  let queueBadge = `${meta.total} Active Queries`;
+
+  if (slaBreachedOnly) {
+    queueTitle = 'Breached SLA Escalation Queue';
+    queueDescription = 'Urgent queries exceeding the 48-hour SLA threshold requiring immediate supervisor intervention.';
+    queueBadge = `${meta.total} Breached`;
+  } else if (assignee === 'mine') {
+    queueTitle = 'Assigned to Me';
+    queueDescription = 'Queries designated to your desk for active investigation, author reply drafting, and resolution.';
+    queueBadge = `${meta.total} Assigned to You`;
+  } else if (assignee === 'unassigned') {
+    queueTitle = 'Unassigned Triage Queue';
+    queueDescription = 'Fresh incoming author queries awaiting an operations specialist or editorial lead.';
+    queueBadge = `${meta.total} Unassigned`;
+  }
 
   return (
     <div className="space-y-6">
@@ -121,14 +172,20 @@ export default function AdminQueuePage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="font-display text-2xl sm:text-3xl font-medium text-foreground tracking-tight">
-              Publishing Operations Queue
+              {queueTitle}
             </h1>
-            <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground">
-              {meta.total} Active Queries
+            <span
+              className={`font-mono text-xs px-2.5 py-0.5 rounded-full border ${
+                slaBreachedOnly
+                  ? 'bg-destructive/10 text-destructive border-destructive/20 font-semibold'
+                  : 'bg-muted border-border text-muted-foreground'
+              }`}
+            >
+              {queueBadge}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1 font-sans">
-            AI-assisted triage, priority enforcement, SLA tracking, and automated response drafting.
+            {queueDescription}
           </p>
         </div>
 
@@ -299,6 +356,7 @@ export default function AdminQueuePage() {
             onChange={(e) => {
               setAssignee(e.target.value);
               setPage(1);
+              updateFilterParam('assignee', e.target.value);
             }}
             className="bg-background border border-input rounded-lg px-2.5 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
           >
@@ -344,6 +402,7 @@ export default function AdminQueuePage() {
                 onChange={(e) => {
                   setSlaBreachedOnly(e.target.checked);
                   setPage(1);
+                  updateFilterParam('slaBreached', e.target.checked);
                 }}
                 className="rounded border-destructive/40 text-destructive focus:ring-destructive/30"
               />
@@ -527,5 +586,21 @@ export default function AdminQueuePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminQueuePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-6">
+          <div className="h-20 bg-muted/40 rounded-xl animate-pulse" />
+          <div className="h-32 bg-muted/40 rounded-xl animate-pulse" />
+          <div className="h-64 bg-muted/40 rounded-xl animate-pulse" />
+        </div>
+      }
+    >
+      <AdminQueueContent />
+    </Suspense>
   );
 }

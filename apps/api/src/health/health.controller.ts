@@ -29,8 +29,17 @@ export class HealthController {
     const aiModel = process.env.AI_MODEL || 'claude-3-5-haiku-20241022';
     const hasAnthropicKey = Boolean(process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY.length > 5);
     const hasOpenAiKey = Boolean(process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 5);
+    const hasGeminiKey = Boolean(
+      (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) &&
+      (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY)!.length > 5,
+    );
 
-    const isAiConfigured = aiProvider === 'openai' ? hasOpenAiKey : hasAnthropicKey;
+    const isAiConfigured =
+      aiProvider === 'openai'
+        ? hasOpenAiKey
+        : aiProvider === 'gemini' || aiProvider === 'google'
+          ? hasGeminiKey
+          : hasAnthropicKey;
 
     return {
       status: 'ok',

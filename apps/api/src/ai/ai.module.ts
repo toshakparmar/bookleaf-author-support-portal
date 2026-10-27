@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { AnthropicProvider } from './providers/anthropic.provider';
 import { OpenAiProvider } from './providers/openai.provider';
+import { GeminiProvider } from './providers/gemini.provider';
 import { KbRetriever } from './knowledge-base/kb.retriever';
 import { AuthorContextBuilder } from './context/author-context.builder';
 
@@ -10,6 +11,7 @@ import { AuthorContextBuilder } from './context/author-context.builder';
     AiService,
     AnthropicProvider,
     OpenAiProvider,
+    GeminiProvider,
     KbRetriever,
     AuthorContextBuilder,
   ],

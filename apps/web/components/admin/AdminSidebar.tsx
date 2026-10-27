@@ -30,7 +30,7 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentAssignee = searchParams?.get('assignee');
+  const currentAssignee = searchParams?.get('assignee')?.toLowerCase();
   const isBreached = searchParams?.get('slaBreached') === 'true';
 
   const navItems = [
@@ -43,15 +43,15 @@ export function AdminSidebar({
     },
     {
       label: 'Assigned to Me',
-      href: '/admin/tickets?assignee=MINE',
+      href: '/admin/tickets?assignee=mine',
       icon: UserCheck,
-      active: currentAssignee === 'MINE',
+      active: currentAssignee === 'mine',
     },
     {
       label: 'Unassigned',
-      href: '/admin/tickets?assignee=UNASSIGNED',
+      href: '/admin/tickets?assignee=unassigned',
       icon: UserX,
-      active: currentAssignee === 'UNASSIGNED',
+      active: currentAssignee === 'unassigned',
     },
     {
       label: 'Breached SLA',

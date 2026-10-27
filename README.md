@@ -132,15 +132,15 @@ All accounts are pre-seeded and idempotent. A 1-click credential selector is ava
 | Author Code | Author Name | Email | Password | Scenario / Edge Case |
 |---|---|---|---|---|
 | `AUTH001` | Priya Sharma | `priya.sharma@email.com` | `Author@123` | 2 published books, ₹3,570 pending royalty |
-| `AUTH002` | Vikram Roy | `vikram.roy@email.com` | `Author@123` | 1 book (*Whispers of the Ghats*), ₹7,980 pending |
-| `AUTH003` | Sneha Kulkarni | `sneha.kulkarni@email.com` | `Author@123` | 3 books, title in production (*Cover Design* stage) |
-| `AUTH004` | Arjun Nair | `arjun.nair@email.com` | `Author@123` | 1 book, zero payouts to date |
-| `AUTH005` | Kavita Deshmukh | `kavita.deshmukh@email.com` | `Author@123` | ₹850 pending royalty (below ₹1,000 rollover threshold) |
-| `AUTH006` | Rajesh Khanna | `rajesh.khanna@email.com` | `Author@123` | Fully paid author copies |
-| `AUTH007` | Diya Mukherjee | `diya.mukherjee@email.com` | `Author@123` | Typographic apostrophe in *Durga’s Daughters* |
-| `AUTH008` | Amit Verma | `amit.verma@email.com` | `Author@123` | Multi-platform listing (Amazon + Flipkart) |
-| `AUTH009` | Ritu Sengupta | `ritu.sengupta@email.com` | `Author@123` | 2 poetry collections, active support thread |
-| `AUTH010` | Tarun Mehta | `tarun.mehta@email.com` | `Author@123` | 2 books, general account query |
+| `AUTH002` | Rohit Kapoor | `rohit.kapoor@email.com` | `Author@123` | 2 books (*Code & Karma*, *Startup Sutra*), ₹7,744 pending |
+| `AUTH003` | Ananya Reddy | `ananya.reddy@email.com` | `Author@123` | 1 book (*Between Two Temples*), 0 payouts to date |
+| `AUTH004` | Vikram Joshi | `vikram.joshi@email.com` | `Author@123` | 2 books (*Debugging Life*, *The Last Monsoon*), ₹3,350 pending |
+| `AUTH005` | Meera Nair | `meera.nair@email.com` | `Author@123` | 2 books (*Cardamom & Chaos*, *Letters from Lakshadweep*) |
+| `AUTH006` | Arjun Malhotra | `arjun.malhotra@email.com` | `Author@123` | 1 book (*Turban Tales*), ₹2,464 pending |
+| `AUTH007` | Sneha Kulkarni | `sneha.kulkarni@email.com` | `Author@123` | 3 books, title in production (*Midnight in Mysore* - Cover Design) |
+| `AUTH008` | Farhan Sheikh | `farhan.sheikh@email.com` | `Author@123` | 1 book (*Ghazal of the Forgotten*), fully paid to date |
+| `AUTH009` | Kavita Deshmukh | `kavita.deshmukh@email.com` | `Author@123` | ₹850 pending royalty (below ₹1,000 threshold - rolls over) |
+| `AUTH010` | Diya Chatterjee | `diya.chatterjee@email.com` | `Author@123` | 2 books (*Durga’s Daughters*, *Howrah Nights*) |
 
 ---
 

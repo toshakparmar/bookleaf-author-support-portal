@@ -1,0 +1,229 @@
+// Prisma Schema for BookLeaf Author Support & Communication Portal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  AUTHOR
+  ADMIN
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Category {
+  ROYALTY_PAYMENTS
+  ISBN_METADATA
+  PRINTING_QUALITY
+  DISTRIBUTION_AVAILABILITY
+  BOOK_STATUS_PRODUCTION
+  GENERAL_INQUIRY
+}
+
+enum AiStatus {
+  PENDING
+  DONE
+  FAILED
+  SKIPPED
+}
+
+enum MessageSender {
+  AUTHOR
+  ADMIN
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(AUTHOR)
+  name         String
+  createdAt    DateTime      @default(now())
+
+  // Relations
+  author          Author?
+  assignedTickets Ticket[]      @relation("AssignedAdmin")
+  messages        TicketMessage[]
+  internalNotes   InternalNote[]
+  ticketEvents    TicketEvent[]
+
+  @@map("users")
+}
+
+model Author {
+  id         String   @id @default(uuid())
+  userId     String?  @unique
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authorCode String   @unique // e.g. AUTH001
+  name       String
+  phone      String
+  city       String
+  joinedDate DateTime
+
+  // Relations
+  books   Book[]
+  tickets Ticket[]
+
+  @@map("authors")
+}
+
+model Book {
+  id                    String    @id @default(uuid())
+  bookCode              String    @unique // e.g. BK001
+  authorId              String
+  author                Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title                 String
+  isbn                  String
+  genre                 String
+  publicationDate       DateTime?
+  status                String    // e.g. "Published & Live", "In Production - Cover Design"
+  mrp                   Float?
+  royaltyPerCopy        Float?
+  totalCopiesSold       Int       @default(0)
+  totalRoyaltyEarned    Float     @default(0)
+  royaltyPaid           Float     @default(0)
+  royaltyPending        Float     @default(0)
+  lastRoyaltyPayoutDate DateTime?
+  printPartner          String?
+  availableOn           String[]  @default([])
+
+  // Relations
+  tickets Ticket[]
+
+  @@map("books")
+}
+
+model Ticket {
+  id                   String        @id @default(uuid())
+  ticketNumber         String        @unique // e.g. BL-1042
+  authorId             String
+  author               Author        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  bookId               String?
+  book                 Book?         @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  subject              String
+  description          String
+  status               TicketStatus  @default(OPEN)
+  category             Category
+  aiCategory           Category?
+  categoryOverriddenBy String?
+  priority             Priority
+  aiPriority           Priority?
+  priorityOverriddenBy String?
+  aiStatus             AiStatus      @default(PENDING)
+  aiClassifiedAt       DateTime?
+  assignedToId         String?
+  assignedTo           User?         @relation("AssignedAdmin", fields: [assignedToId], references: [id], onDelete: SetNull)
+  attachmentMeta       Json?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  resolvedAt           DateTime?
+  lastActivityAt       DateTime      @default(now())
+
+  // Relations
+  messages      TicketMessage[]
+  internalNotes InternalNote[]
+  drafts        AiDraft[]
+  events        TicketEvent[]
+  aiLogs        AiLog[]
+
+  @@index([status, priority, createdAt])
+  @@index([authorId])
+  @@index([assignedToId])
+  @@index([category])
+  @@map("tickets")
+}
+
+model TicketMessage {
+  id           String        @id @default(uuid())
+  ticketId     String
+  ticket       Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender       MessageSender
+  senderUserId String
+  senderUser   User          @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
+  body         String
+  wasAiDrafted Boolean       @default(false)
+  aiDraftId    String?
+  createdAt    DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_messages")
+}
+
+model InternalNote {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  adminId   String
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("internal_notes")
+}
+
+model AiDraft {
+  id             String   @id @default(uuid())
+  ticketId       String
+  ticket         Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  body           String
+  flags          String[] @default([])
+  model          String
+  inputTokens    Int      @default(0)
+  outputTokens   Int      @default(0)
+  createdAt      DateTime @default(now())
+  basedOnVersion String
+
+  @@index([ticketId, basedOnVersion])
+  @@map("ai_drafts")
+}
+
+model AiLog {
+  id               String   @id @default(uuid())
+  ticketId         String?
+  ticket           Ticket?  @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  kind             String   // e.g. "CLASSIFY", "DRAFT"
+  model            String
+  inputTokens      Int      @default(0)
+  outputTokens     Int      @default(0)
+  estimatedCostUsd Float    @default(0)
+  latencyMs        Int      @default(0)
+  success          Boolean  @default(true)
+  errorType        String?
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([kind])
+  @@map("ai_logs")
+}
+
+model TicketEvent {
+  id        String   @id @default(uuid())
+  ticketId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  type      String   // e.g. CREATED, STATUS_CHANGED, CATEGORY_OVERRIDDEN, PRIORITY_OVERRIDDEN, ASSIGNED, REPLY_SENT, NOTE_ADDED, AI_CLASSIFIED, AI_FAILED
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("ticket_events")
+}

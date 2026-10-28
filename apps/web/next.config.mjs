@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    unoptimized: true,
+  },
   async rewrites() {
-    const apiTarget = process.env.API_INTERNAL_URL || 'http://localhost:3001';
+    const rawTarget = process.env.API_INTERNAL_URL || 'http://localhost:3001';
+    const apiTarget = rawTarget.replace(/\/+$/, '');
     return [
       {
         source: '/api/:path*',

@@ -398,7 +398,7 @@ export class AiService {
       .trim();
   }
 
-  private async executeWithRetry<T>(fn: () => Promise<T>, retries = 2, delay = 800): Promise<T> {
+  private async executeWithRetry<T>(fn: () => Promise<T>, retries = 1, delay = 500): Promise<T> {
     try {
       return await fn();
     } catch (err: any) {

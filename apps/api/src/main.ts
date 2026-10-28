@@ -28,11 +28,21 @@ async function bootstrap() {
 
   // 3. CORS Configuration
   app.enableCors({
-    origin: [
-      validatedConfig.CORS_ORIGIN,
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile, curl, server-to-server proxies like Next.js rewrites)
+      if (!origin) return callback(null, true);
+      const configuredOrigins = (validatedConfig.CORS_ORIGIN || '').split(',').map((s) => s.trim());
+      if (
+        configuredOrigins.includes(origin) ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.onrender.com')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'Cache-Control'],

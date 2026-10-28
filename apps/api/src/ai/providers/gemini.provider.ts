@@ -15,8 +15,10 @@ export class GeminiProvider implements LlmProvider {
       this.client = new OpenAI({
         apiKey,
         baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+        timeout: 12000,
+        maxRetries: 0,
       });
-      this.logger.log(`Gemini Provider initialized with model: ${this.defaultModel}`);
+      this.logger.log(`Gemini Provider initialized with model: ${this.defaultModel} (timeout: 12s)`);
     } else {
       this.logger.warn('GEMINI_API_KEY is not configured. Calls will fall back to heuristics.');
     }

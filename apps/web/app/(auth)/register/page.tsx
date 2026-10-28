@@ -16,6 +16,8 @@ import {
   Lock,
   Mail,
   ArrowRight,
+  ArrowLeft,
+  Home,
   Eye,
   EyeOff,
   Sparkles,
@@ -121,7 +123,15 @@ export default function RegisterPage() {
         <div className="absolute inset-0 paper-grain pointer-events-none opacity-20" />
 
         {/* Brand header */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex items-center justify-between">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-mono text-white transition group"
+            title="Return to BookLeaf Homepage"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1 text-[#E0A526]" />
+            <span>bookleaf.in</span>
+          </Link>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-mono uppercase tracking-widest text-[#E0A526]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Author Portal Onboarding</span>
@@ -208,8 +218,29 @@ export default function RegisterPage() {
           ref={formCardRef}
           className="w-full max-w-md bg-card border border-border rounded-xl p-8 shadow-subtle"
         >
+          {/* Back to Home Button */}
+          <div className="mb-6 flex items-center justify-between">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-xs font-mono font-medium text-muted-foreground hover:text-foreground transition-all group py-1.5 px-3 rounded-lg bg-muted/60 hover:bg-muted border border-border/60 shadow-sm"
+              title="Return to BookLeaf Landing Page"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1 text-primary" />
+              <span>Back to Home</span>
+            </Link>
+            <Link
+              href="/"
+              className="text-xs font-mono text-muted-foreground hover:text-foreground transition flex items-center gap-1.5"
+            >
+              <Home className="w-3.5 h-3.5 text-primary" />
+              <span className="hidden sm:inline">Landing Page</span>
+            </Link>
+          </div>
+
           <div className="mb-6">
-            <Logo size="md" />
+            <Link href="/" title="BookLeaf Home" className="inline-block hover:opacity-90 transition">
+              <Logo size="md" />
+            </Link>
             <h2 className="mt-4 font-display text-2xl font-medium text-foreground tracking-tight">
               Register as an Author
             </h2>

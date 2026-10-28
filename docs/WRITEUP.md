@@ -3,7 +3,7 @@
 ## 1. What I Prioritised
 
 1. **AI Integration Quality & Resilience (25% weight):**
-   - Implemented a provider-agnostic LLM interface supporting both Anthropic Claude 3.5 Haiku and OpenAI GPT-4o-mini.
+   - Implemented a provider-agnostic LLM interface with Google Gemini 3.5 Flash as the primary engine (with Anthropic Claude 3.5 Haiku and OpenAI GPT-4o-mini support).
    - Guarded against LLM hallucination on financial and production facts by deterministically computing quarterly royalty payout dates, statutory 45-day deadlines, and rollover thresholds in pure TypeScript before injecting them into prompt context.
    - Built a deterministic priority rule safety net (`max(aiPriority, ruleFloor)`) guaranteeing that severe legal escalations or multi-month unpaid royalties are elevated to Critical, and ISBN errors enforce a minimum High priority.
    - Integrated full graceful degradation: when LLMs are unconfigured or fail, keyword heuristics assign best-effort categories, tickets are never blocked, and admins can reply manually with clear visual status banners.

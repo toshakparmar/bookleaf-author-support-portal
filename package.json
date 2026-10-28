@@ -24,6 +24,10 @@
     "prisma:seed": "npm run prisma:seed --workspace=apps/api",
     "eval:classify": "npm run eval:classify --workspace=apps/api"
   },
+  "dependencies": {
+    "@nestjs/cli": "^10.4.9",
+    "typescript": "^5.7.3"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   }

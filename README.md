@@ -5,6 +5,18 @@
 
 ---
 
+### 🌐 Live Production Deployments
+
+| Service | Live URL | Platform | Status |
+| :--- | :--- | :--- | :--- |
+| **Author & Admin Portal** | [**https://bookleaf.toshakparmar.in**](https://bookleaf.toshakparmar.in) | Vercel (Next.js 14) | 🟢 **Live** |
+| **Backend REST API** | [**https://bookleaf-author-support-portal-4uso.onrender.com**](https://bookleaf-author-support-portal-4uso.onrender.com) | Render (NestJS) | 🟢 **Live** |
+| **System Health Check** | [**Live Health Endpoint**](https://bookleaf-author-support-portal-4uso.onrender.com/api/v1/health) | Render + Supabase | 🟢 **Connected** |
+| **Interactive API Docs** | [**Swagger OpenAPI Console**](https://bookleaf-author-support-portal-4uso.onrender.com/api/docs) | Swagger UI | 🟢 **Available** |
+| **GitHub Repository** | [**bookleaf-author-support-portal**](https://github.com/toshakparmar/bookleaf-author-support-portal) | GitHub | 🔒 **Private** |
+
+---
+
 ## 1. Executive Summary & Capabilities
 
 BookLeaf Publishing is a leading self-publishing house (operating across India and the US) processing over 1,200 titles per month across a 22,000+ title catalog. This portal solves author inquiry backlogs and inconsistent replies by providing two dedicated interfaces:
@@ -168,16 +180,17 @@ The application uses **Google Gemini 3.5 Flash** for two core workflows:
 5. **Expected Result:** The AI categorizes the ticket as `PRINT_QUALITY` with high confidence and assigns the priority level automatically.
 
 ### C. System Health & AI Verification Endpoint
-Visit `http://localhost:3001/api/v1/health` (or your live Render API URL) to check:
+Visit the live health endpoint: [`https://bookleaf-author-support-portal-4uso.onrender.com/api/v1/health`](https://bookleaf-author-support-portal-4uso.onrender.com/api/v1/health) to check live status:
 ```json
 {
   "status": "ok",
-  "database": { "status": "connected", "latencyMs": 42 },
+  "database": { "status": "connected", "latencyMs": 595 },
   "ai": {
     "provider": "gemini",
     "model": "gemini-3.5-flash",
     "configured": true
-  }
+  },
+  "environment": "production"
 }
 ```
 
@@ -185,7 +198,11 @@ Visit `http://localhost:3001/api/v1/health` (or your live Render API URL) to che
 
 ## 7. Production Deployment (Render + Vercel)
 
-This project is optimized for deployment using **Render** (Backend API) and **Vercel** (Frontend Next.js):
+This project is deployed using **Render** (Backend API) and **Vercel** (Frontend Next.js):
+
+- **Live Frontend:** [https://bookleaf.toshakparmar.in](https://bookleaf.toshakparmar.in)
+- **Live Backend API:** [https://bookleaf-author-support-portal-4uso.onrender.com](https://bookleaf-author-support-portal-4uso.onrender.com)
+- **API Swagger Documentation:** [https://bookleaf-author-support-portal-4uso.onrender.com/api/docs](https://bookleaf-author-support-portal-4uso.onrender.com/api/docs)
 
 ### Step 1: Deploy Backend on Render
 1. Go to [dashboard.render.com](https://dashboard.render.com/) → **New Web Service** → Connect your GitHub repo.
@@ -202,8 +219,7 @@ This project is optimized for deployment using **Render** (Backend API) and **Ve
    - `AI_PROVIDER`: `gemini`
    - `AI_MODEL`: `gemini-3.5-flash`
    - `GEMINI_API_KEY`: *(your Gemini API key)*
-   - `CORS_ORIGIN`: `https://*.vercel.app`
-4. Deploy and copy your backend URL (e.g. `https://bookleaf-api.onrender.com`).
+   - `CORS_ORIGIN`: `https://bookleaf.toshakparmar.in,https://*.vercel.app`
 
 *(A `render.yaml` blueprint is also included in the repository for 1-click infrastructure-as-code deployment).*
 
@@ -213,9 +229,9 @@ This project is optimized for deployment using **Render** (Backend API) and **Ve
    - **Framework Preset:** `Next.js`
    - **Root Directory:** Edit to `apps/web`.
 3. Set Environment Variables:
-   - `API_INTERNAL_URL`: `https://bookleaf-api.onrender.com` *(your Render backend URL)*
+   - `API_INTERNAL_URL`: `https://bookleaf-author-support-portal-4uso.onrender.com`
    - `NEXT_PUBLIC_APP_NAME`: `BookLeaf Author Portal`
-4. Click **Deploy**. Vercel will build and assign your live domain with zero CORS issues via server-to-server proxy rewrites.
+4. Click **Deploy**. Vercel builds and serves the site with custom domain support and zero CORS issues via server-to-server proxy rewrites.
 
 ---
 

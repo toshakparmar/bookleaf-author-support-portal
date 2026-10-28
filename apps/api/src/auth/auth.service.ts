@@ -56,63 +56,48 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
-    const targetRole = dto.role || Role.AUTHOR;
 
-    let user: any;
+    // Public registration is strictly for Authors (Admins are pre-seeded operational staff)
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const authorCode = `AUTH${randomSuffix}`;
+    const bookCode = `BK${randomSuffix}`;
+    const isbn = `978-93-5${Math.floor(10000 + Math.random() * 90000)}-${Math.floor(10 + Math.random() * 90)}-${Math.floor(1 + Math.random() * 9)}`;
 
-    if (targetRole === Role.ADMIN) {
-      user = await this.prisma.user.create({
-        data: {
-          email: normalizedEmail,
-          passwordHash,
-          name: dto.name.trim(),
-          role: Role.ADMIN,
-        },
-        include: { author: true },
-      });
-    } else {
-      // Generate unique authorCode and bookCode
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const authorCode = `AUTH${randomSuffix}`;
-      const bookCode = `BK${randomSuffix}`;
-      const isbn = `978-93-5${Math.floor(10000 + Math.random() * 90000)}-${Math.floor(10 + Math.random() * 90)}-${Math.floor(1 + Math.random() * 9)}`;
-
-      user = await this.prisma.user.create({
-        data: {
-          email: normalizedEmail,
-          passwordHash,
-          name: dto.name.trim(),
-          role: Role.AUTHOR,
-          author: {
-            create: {
-              authorCode,
-              name: dto.name.trim(),
-              phone: dto.phone?.trim() || '+91 98000 00000',
-              city: dto.city?.trim() || 'New Delhi',
-              joinedDate: new Date(),
-              books: {
-                create: {
-                  bookCode,
-                  title: dto.initialBookTitle?.trim() || 'My Debut Manuscript',
-                  isbn,
-                  genre: 'Fiction & Literature',
-                  status: 'Published & Live',
-                  mrp: 399,
-                  royaltyPerCopy: 35,
-                  totalCopiesSold: 18,
-                  totalRoyaltyEarned: 630,
-                  royaltyPaid: 0,
-                  royaltyPending: 630,
-                  publicationDate: new Date(),
-                  availableOn: ['Amazon India', 'Flipkart', 'BookLeaf Store'],
-                },
+    const user = await this.prisma.user.create({
+      data: {
+        email: normalizedEmail,
+        passwordHash,
+        name: dto.name.trim(),
+        role: Role.AUTHOR,
+        author: {
+          create: {
+            authorCode,
+            name: dto.name.trim(),
+            phone: dto.phone?.trim() || '+91 98000 00000',
+            city: dto.city?.trim() || 'New Delhi',
+            joinedDate: new Date(),
+            books: {
+              create: {
+                bookCode,
+                title: dto.initialBookTitle?.trim() || 'My Debut Manuscript',
+                isbn,
+                genre: 'Fiction & Literature',
+                status: 'Published & Live',
+                mrp: 399,
+                royaltyPerCopy: 35,
+                totalCopiesSold: 18,
+                totalRoyaltyEarned: 630,
+                royaltyPaid: 0,
+                royaltyPending: 630,
+                publicationDate: new Date(),
+                availableOn: ['Amazon India', 'Flipkart', 'BookLeaf Store'],
               },
             },
           },
         },
-        include: { author: true },
-      });
-    }
+      },
+      include: { author: true },
+    });
 
     return this.login(user, res);
   }

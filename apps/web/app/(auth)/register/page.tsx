@@ -25,7 +25,6 @@ import {
   Phone,
   BookOpen,
   ShieldCheck,
-  UserCheck,
 } from 'lucide-react';
 
 const AtmosphericBackground = dynamic(
@@ -42,7 +41,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<'AUTHOR' | 'ADMIN'>('AUTHOR');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
   const [initialBookTitle, setInitialBookTitle] = useState('');
@@ -75,24 +73,19 @@ export default function RegisterPage() {
     setErrorMessage('');
 
     try {
-      const res = await fetchApi('/auth/register', {
+      await fetchApi('/auth/register', {
         method: 'POST',
         body: JSON.stringify({
           name,
           email,
           password,
-          role,
           city: city || undefined,
           phone: phone || undefined,
-          initialBookTitle: role === 'AUTHOR' ? (initialBookTitle || 'My Debut Manuscript') : undefined,
+          initialBookTitle: initialBookTitle || 'My Debut Manuscript',
         }),
       });
 
-      if (res.user?.role === 'ADMIN') {
-        router.push('/admin/tickets');
-      } else {
-        router.push('/author/books');
-      }
+      router.push('/author/books');
       router.refresh();
     } catch (err: any) {
       setErrorMessage(
@@ -131,7 +124,7 @@ export default function RegisterPage() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-mono uppercase tracking-widest text-[#E0A526]">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>New Author Onboarding</span>
+            <span>Author Portal Onboarding</span>
           </div>
         </div>
 
@@ -143,7 +136,7 @@ export default function RegisterPage() {
             delay={0.2}
           />
           <p className="mt-6 text-sm sm:text-base text-white/80 leading-relaxed font-sans font-light">
-            Create your account to track ISBN registrations, print runs, nationwide retail distribution across Amazon &amp; Flipkart, and receive transparent quarterly royalties.
+            Create your author account to track ISBN registrations, print runs, nationwide retail distribution across Amazon &amp; Flipkart, and receive transparent quarterly royalties.
           </p>
 
           {/* Floating procedural book-cover pair */}
@@ -218,10 +211,10 @@ export default function RegisterPage() {
           <div className="mb-6">
             <Logo size="md" />
             <h2 className="mt-4 font-display text-2xl font-medium text-foreground tracking-tight">
-              Create your account
+              Register as an Author
             </h2>
             <p className="mt-1.5 text-xs text-muted-foreground font-sans">
-              Enter your publishing details to access your author catalog or ops console.
+              Enter your publishing details to access your author catalog, royalty ledger, and support tickets.
             </p>
           </div>
 
@@ -232,38 +225,10 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Account Role Selector */}
-          <div className="mb-5 p-1 rounded-lg bg-muted flex gap-1 text-xs">
-            <button
-              type="button"
-              onClick={() => setRole('AUTHOR')}
-              className={`flex-1 py-1.5 px-3 rounded-md font-medium transition flex items-center justify-center gap-1.5 ${
-                role === 'AUTHOR'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <UserCheck className="w-3.5 h-3.5 text-primary" />
-              <span>Author / Writer</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('ADMIN')}
-              className={`flex-1 py-1.5 px-3 rounded-md font-medium transition flex items-center justify-center gap-1.5 ${
-                role === 'ADMIN'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#3E6FA8]" />
-              <span>Operations Admin</span>
-            </button>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <div>
               <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
-                Full Name
+                Author Full Name
               </label>
               <div className="relative rounded-lg">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
@@ -331,84 +296,91 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {role === 'AUTHOR' && (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
-                      City
-                    </label>
-                    <div className="relative rounded-lg">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <input
-                        type="text"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="block w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
-                        placeholder="e.g. Mumbai"
-                      />
-                    </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+                  City
+                </label>
+                <div className="relative rounded-lg">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                    <MapPin className="w-4 h-4" />
                   </div>
-
-                  <div>
-                    <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
-                      Phone (Optional)
-                    </label>
-                    <div className="relative rounded-lg">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-                        <Phone className="w-4 h-4" />
-                      </div>
-                      <input
-                        type="text"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="block w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
-                        placeholder="+91..."
-                      />
-                    </div>
-                  </div>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="block w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
+                    placeholder="e.g. Mumbai"
+                  />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
-                    Book Title
-                  </label>
-                  <div className="relative rounded-lg">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-                      <BookOpen className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="text"
-                      value={initialBookTitle}
-                      onChange={(e) => setInitialBookTitle(e.target.value)}
-                      className="block w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
-                      placeholder="e.g. The Silent Horizon (or leave blank)"
-                    />
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+                  Phone (Optional)
+                </label>
+                <div className="relative rounded-lg">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                    <Phone className="w-4 h-4" />
                   </div>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="block w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
+                    placeholder="+91..."
+                  />
                 </div>
-              </>
-            )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+                Book Title (Debut Manuscript)
+              </label>
+              <div className="relative rounded-lg">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  value={initialBookTitle}
+                  onChange={(e) => setInitialBookTitle(e.target.value)}
+                  className="block w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-foreground placeholder:text-muted-foreground/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
+                  placeholder="e.g. The Silent Horizon (or leave blank)"
+                />
+              </div>
+            </div>
 
             <button
               type="submit"
               disabled={loading}
               className="w-full !mt-5 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold uppercase tracking-wider text-primary-foreground bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/40 transition disabled:opacity-50"
             >
-              {loading ? 'Creating Account...' : 'Complete Registration'}
+              {loading ? 'Registering Author...' : 'Complete Author Registration'}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </form>
 
           {/* Switch to Login Link */}
-          <div className="mt-6 pt-5 border-t border-border text-center">
+          <div className="mt-6 pt-5 border-t border-border text-center space-y-3">
             <p className="text-xs text-muted-foreground">
-              Already have an account?{' '}
+              Already have an author account?{' '}
               <Link href="/login" className="font-semibold text-primary hover:underline">
                 Sign in to your account
               </Link>
             </p>
+
+            {/* Note for Operations Staff */}
+            <div className="p-2.5 rounded-lg bg-muted/50 border border-border text-left flex items-start gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#3E6FA8] shrink-0 mt-0.5" />
+              <div className="text-[11px] text-muted-foreground leading-relaxed">
+                <span className="font-medium text-foreground">BookLeaf Operations Staff:</span> Admin accounts are provisioned internally. Please sign in with your staff credentials on the{' '}
+                <Link href="/login" className="text-primary font-medium hover:underline">
+                  Login page
+                </Link>.
+              </div>
+            </div>
           </div>
         </div>
       </div>

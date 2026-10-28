@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { fetchApi } from '../../../lib/api';
 import { gsap } from '../../../lib/gsap';
@@ -321,8 +322,18 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* New Account / Register Link */}
+          <div className="mt-5 text-center">
+            <p className="text-xs text-muted-foreground">
+              New author or team member?{' '}
+              <Link href="/register" className="font-semibold text-primary hover:underline">
+                Create an account
+              </Link>
+            </p>
+          </div>
+
           {/* Collapsed demo account popover */}
-          <div className="mt-8 pt-6 border-t border-border">
+          <div className="mt-6 pt-5 border-t border-border">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground font-sans">
                 Testing or evaluating?

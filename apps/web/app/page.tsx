@@ -110,10 +110,10 @@ export default function PublicLandingPage() {
                 Sign In
               </Link>
               <Link
-                href="/login"
+                href="/register"
                 className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-primary-foreground text-xs font-semibold uppercase tracking-wider shadow-subtle transition"
               >
-                <span>Open Portal</span>
+                <span>Get Started</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -150,10 +150,10 @@ export default function PublicLandingPage() {
                 <div className="flex items-center gap-3.5 pt-2 flex-wrap">
                   <Magnet strength={0.2}>
                     <Link
-                      href="/login"
+                      href="/register"
                       className="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-primary hover:bg-primary-hover text-primary-foreground text-xs font-semibold uppercase tracking-wider shadow-elevated transition"
                     >
-                      <span>Author Portal Login</span>
+                      <span>Join as New Author</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </Magnet>
@@ -162,7 +162,7 @@ export default function PublicLandingPage() {
                     href="/login"
                     className="inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-card border border-border hover:bg-muted text-foreground text-xs font-medium transition"
                   >
-                    <span>Operations Console</span>
+                    <span>Author &amp; Ops Sign In</span>
                   </Link>
                 </div>
 

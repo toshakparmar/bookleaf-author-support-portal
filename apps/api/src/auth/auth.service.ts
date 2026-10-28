@@ -1,9 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { AUTH_COOKIE_NAME } from '../common/constants';
 import { ErrorCode } from '../common/errors/error-codes';
 
@@ -36,6 +38,83 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async register(dto: RegisterDto, res: Response) {
+    const normalizedEmail = dto.email.toLowerCase().trim();
+
+    // Check if user already exists
+    const existing = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existing) {
+      throw new ConflictException({
+        code: ErrorCode.EMAIL_ALREADY_EXISTS,
+        message: 'An account with this email address already exists. Please sign in instead.',
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const targetRole = dto.role || Role.AUTHOR;
+
+    let user: any;
+
+    if (targetRole === Role.ADMIN) {
+      user = await this.prisma.user.create({
+        data: {
+          email: normalizedEmail,
+          passwordHash,
+          name: dto.name.trim(),
+          role: Role.ADMIN,
+        },
+        include: { author: true },
+      });
+    } else {
+      // Generate unique authorCode and bookCode
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const authorCode = `AUTH${randomSuffix}`;
+      const bookCode = `BK${randomSuffix}`;
+      const isbn = `978-93-5${Math.floor(10000 + Math.random() * 90000)}-${Math.floor(10 + Math.random() * 90)}-${Math.floor(1 + Math.random() * 9)}`;
+
+      user = await this.prisma.user.create({
+        data: {
+          email: normalizedEmail,
+          passwordHash,
+          name: dto.name.trim(),
+          role: Role.AUTHOR,
+          author: {
+            create: {
+              authorCode,
+              name: dto.name.trim(),
+              phone: dto.phone?.trim() || '+91 98000 00000',
+              city: dto.city?.trim() || 'New Delhi',
+              joinedDate: new Date(),
+              books: {
+                create: {
+                  bookCode,
+                  title: dto.initialBookTitle?.trim() || 'My Debut Manuscript',
+                  isbn,
+                  genre: 'Fiction & Literature',
+                  status: 'Published & Live',
+                  mrp: 399,
+                  royaltyPerCopy: 35,
+                  totalCopiesSold: 18,
+                  totalRoyaltyEarned: 630,
+                  royaltyPaid: 0,
+                  royaltyPending: 630,
+                  publicationDate: new Date(),
+                  availableOn: ['Amazon India', 'Flipkart', 'BookLeaf Store'],
+                },
+              },
+            },
+          },
+        },
+        include: { author: true },
+      });
+    }
+
+    return this.login(user, res);
   }
 
   async login(user: any, res: Response) {
